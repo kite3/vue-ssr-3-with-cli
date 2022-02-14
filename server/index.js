@@ -1,45 +1,23 @@
-const fs = require("fs");
-const Koa = require("koa");
-const path = require("path");
-const koaStatic = require('koa-static')
-const app = new Koa();
+const Koa = require('koa')
+const koaStatic = require('koa-static');
+const koaMount = require('koa-mount')
+const path = require('path')
 
 const resolve = file => path.resolve(__dirname, file);
-// 开放dist目录
-app.use(koaStatic(resolve('../dist')))
+const app = new Koa()
 
-// 第 2 步：获得一个createBundleRenderer
-const { createBundleRenderer } = require("vue-server-renderer");
-const bundle = require("../dist/vue-ssr-server-bundle.json");
-const clientManifest = require("../dist/vue-ssr-client-manifest.json");
+const isDev = process.env.NODE_ENV !== 'production'
+const router = isDev ? require('./dev.ssr') : require('./prod.ssr')
 
-const renderer = createBundleRenderer(bundle, {
-  runInNewContext: false,
-  template: fs.readFileSync(resolve("../src/index.temp.html"), "utf-8"),
-  clientManifest: clientManifest
-});
+app.use(router.routes()).use(router.allowedMethods())
+// 开放目录
+app.use(koaMount('/dist', koaStatic(resolve('../dist'))));
+app.use(koaMount('/public', koaStatic(resolve('../public'))));
 
-function renderToString(context) {
-  return new Promise((resolve, reject) => {
-    renderer.renderToString(context, (err, html) => {
-      err ? reject(err) : resolve(html);
-    });
-  });
-}
-// 第 3 步：添加一个中间件来处理所有请求
-app.use(async (ctx, next) => {
-  const context = {
-    title: "ssr test",
-    url: ctx.url
-  };
-  console.log(context)
-  // 将 context 数据渲染为 HTML
-  const html = await renderToString(context);
-  console.log(html)
-  ctx.body = html;
-});
+const port = process.env.PORT || 3001;
 
-const port = 3001;
-app.listen(port, function() {
+app.listen(port, () => {
   console.log(`server started at localhost:${port}`);
 });
+
+module.exports = app

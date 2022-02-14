@@ -8,7 +8,7 @@ const isDev = process.env.NODE_ENV !== 'production'
 
 module.exports = {
   lintOnSave: false,
-  // baseUrl: isDev ? 'http://127.0.0.1:3001' : 'http://127.0.0.1:3001',
+  baseUrl: isDev ? 'http://127.0.0.1:8080' : 'http://127.0.0.1:3001',
   devServer: {
     historyApiFallback: true,
     headers: { 'Access-Control-Allow-Origin': '*' }
