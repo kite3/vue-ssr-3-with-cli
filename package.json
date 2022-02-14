@@ -3,20 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "dev": "vue-cli-service serve",
+    "build:client": "vue-cli-service build",
+    "build:server": "cross-env WEBPACK_TARGET=node vue-cli-service build --mode server",
+    "build:win": "npm run build:server && move dist\\vue-ssr-server-bundle.json bundle && npm run build:client && move bundle dist\\vue-ssr-server-bundle.json",
+    "build:mac": "npm run build:server && mv dist/vue-ssr-server-bundle.json bundle && npm run build:client && mv bundle dist/vue-ssr-server-bundle.json"
   },
   "dependencies": {
     "core-js": "^2.6.5",
-    "vue": "^2.6.10",
+    "koa": "^2.13.4",
+    "koa-static": "^5.0.0",
+    "vue": "2.6.14",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.1",
     "@vue/cli-service": "^3.0.1",
+    "cross-env": "^7.0.3",
+    "lodash.merge": "^4.6.2",
     "node-sass": "^4.12.0",
     "sass-loader": "^8.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "vue-server-renderer": "2.6.14",
+    "vue-template-compiler": "2.6.14",
+    "webpack-node-externals": "^3.0.0"
   }
 }
