@@ -7,7 +7,7 @@ const send = require('koa-send')
 const Router = require('koa-router')
 // 1、webpack配置文件
 const webpackConfig = require('@vue/cli-service/webpack.config')
-const {createBundleRenderer} = require('vue-server-renderer')
+const { createBundleRenderer } = require('vue-server-renderer')
 
 // 2、编译webpack配置文件
 const serverCompiler = webpack(webpackConfig)
@@ -24,7 +24,10 @@ serverCompiler.watch({}, (err, stats) => {
   // stats = stats.toJson()
   // stats.errors.forEach(error => console.error(error) )
   // stats.warnings.forEach( warn => console.warn(warn) )
-  const bundlePath = path.join(webpackConfig.output.path, 'vue-ssr-server-bundle.json')
+  const bundlePath = path.join(
+    webpackConfig.output.path,
+    'vue-ssr-server-bundle.json'
+  )
   bundle = JSON.parse(mfs.readFileSync(bundlePath, 'utf-8'))
   console.log('===========================================')
   console.log('new bundle generated')
@@ -39,17 +42,22 @@ const handleRequest = async ctx => {
   const url = ctx.path
   if (url.includes('favicon.ico')) {
     console.log(`proxy ${url}`)
-    return await send(ctx, url, {root: path.resolve(__dirname, '../public')})
+    return await send(ctx, url, { root: path.resolve(__dirname, '../public') })
   }
 
   // 4、获取最新的 vue-ssr-client-manifest.json
-  const clientManifestResp = await axios.get('http://localhost:8080/vue-ssr-client-manifest.json')
+  const clientManifestResp = await axios.get(
+    'http://localhost:8080/vue-ssr-client-manifest.json'
+  )
   const clientManifest = clientManifestResp.data
 
   const renderer = createBundleRenderer(bundle, {
     runInNewContext: false,
-    template: fs.readFileSync(path.resolve(__dirname, '../src/index.temp.html'), 'utf-8'),
-    clientManifest: clientManifest,
+    template: fs.readFileSync(
+      path.resolve(__dirname, '../src/index.temp.html'),
+      'utf-8'
+    ),
+    clientManifest: clientManifest
   })
   const html = await renderToString(ctx, renderer)
   ctx.body = html
